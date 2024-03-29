@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
-public class CollegeCourseNotificationService implements NotificationService {
+public class AirlineBookingNotificationService implements NotificationService {
     private final CollegeCourseEmailService mateEmailService;
     private final NotificationRepository notificationRepository;
 

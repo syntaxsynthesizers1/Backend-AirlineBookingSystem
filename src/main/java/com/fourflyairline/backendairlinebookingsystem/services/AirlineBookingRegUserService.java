@@ -6,10 +6,8 @@ import com.fourflyairline.backendairlinebookingsystem.dto.request.CreateUserRequ
 import com.fourflyairline.backendairlinebookingsystem.dto.response.UserResponse;
 import com.fourflyairline.backendairlinebookingsystem.exceptions.CollegeCourseRegistrationException;
 import com.fourflyairline.backendairlinebookingsystem.globalDTO.Response;
-import com.fourflyairline.backendairlinebookingsystem.model.Profile;
 import com.fourflyairline.backendairlinebookingsystem.model.User;
 import com.fourflyairline.backendairlinebookingsystem.model.VerificationToken;
-import com.fourflyairline.backendairlinebookingsystem.repositories.ProfileRepository;
 import com.fourflyairline.backendairlinebookingsystem.repositories.UserRepository;
 import com.fourflyairline.backendairlinebookingsystem.repositories.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +29,13 @@ import static com.fourflyairline.backendairlinebookingsystem.model.Authority.USE
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CollegeCourseRegUserService implements UserService {
+public class AirlineBookingRegUserService implements UserService {
     private final UserRepository userRepository;
 
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenRepository tokenRepository;
-    private final ProfileRepository profileRepository;
+
     private final NotificationService notificationService;
 
 
@@ -55,15 +53,12 @@ public class CollegeCourseRegUserService implements UserService {
         User newUser = new User();
         newUser.setEmail(createUserRequest.getEmail());
         newUser.setPassword(encodedPassword);
-        Profile profile = new Profile();
-        profile.setFirstName(createUserRequest.getFirstName());
-        profile.setLastName(createUserRequest.getLastName());
+        newUser.setFirstName(createUserRequest.getFirstName());
+        newUser.setLastName(createUserRequest.getLastName());
         String token =  UUID.randomUUID().toString();
         VerificationToken verificationToken = new VerificationToken(token, newUser);
         tokenRepository.save(verificationToken);
        newUser.setToken(verificationToken);
-       Profile profile1 =   profileRepository.save(profile);
-        newUser.setProfile(profile1);
         newUser.setAuthorities(List.of(USER));
 
         return userRepository.save(newUser);

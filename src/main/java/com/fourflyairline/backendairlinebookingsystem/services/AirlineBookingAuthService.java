@@ -28,7 +28,7 @@ import static com.fourflyairline.backendairlinebookingsystem.model.Authority.USE
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CollegeCourseAuthService implements AuthService {
+public class AirlineBookingAuthService implements AuthService {
 
     private final CollegeCourseEmailService mailService;
     private final ModelMapper modelMapper;

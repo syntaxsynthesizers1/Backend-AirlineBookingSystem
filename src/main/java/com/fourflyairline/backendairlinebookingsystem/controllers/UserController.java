@@ -19,7 +19,7 @@ public class UserController {
 
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getUser(@PathVariable Long id) throws CollegeCourseRegistrationException {
+    public ResponseEntity<?> getUser(@PathVariable Long id)  {
         try {
             return ResponseEntity.ok(userService.getUserBy(id));
         }catch (CollegeCourseRegistrationException exception){

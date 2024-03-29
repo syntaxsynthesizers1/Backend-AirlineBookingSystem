@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -24,19 +25,21 @@ public class User {
     private String password;
     @Enumerated
     private List<Authority> authorities;
-    @OneToOne
-    private Profile profile;
+
     @OneToOne(cascade = CascadeType.ALL)
     private VerificationToken token;
     private boolean isEnabled = false;
     @OneToMany
-    private Set<User> friends;
-
-    @OneToMany
-    private Set<User> friendRequest;
-    @OneToMany
-    private Set<User> recievedFriendRequest;
-    @OneToMany
     private List<Notification> notifications;
+
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String gender;
+    private LocalDateTime dob;
+    private String NIC;
+
+
+
 
 }
