@@ -1,5 +1,6 @@
 package com.fourflyairline.backendairlinebookingsystem.security;
 
+import com.fourflyairline.backendairlinebookingsystem.model.Authority;
 import com.fourflyairline.backendairlinebookingsystem.security.filters.CollegeCourseAuthenticationFilter;
 import com.fourflyairline.backendairlinebookingsystem.security.filters.CollegeCourseAuthorizationFilter;
 import com.fourflyairline.backendairlinebookingsystem.security.services.JwtService;
@@ -7,11 +8,13 @@ import com.fourflyairline.backendairlinebookingsystem.security.utils.SecurityUti
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -20,6 +23,7 @@ import java.util.List;
 
 @Configuration
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class SecurityConfig {
 
     private final AuthenticationManager authenticationManager;
@@ -40,23 +44,8 @@ public class SecurityConfig {
                 .addFilterAt(new CollegeCourseAuthenticationFilter(authenticationManager, jwtService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(authorizationFilter, CollegeCourseAuthenticationFilter.class)
                 .authorizeHttpRequests(c->c.requestMatchers(getPublicEndpoints()).permitAll()
-                                .anyRequest().authenticated()
-                //     .requestMatchers(HttpMethod.PUT, "/api/v1/auth", "/api/v1/auth/**").hasAnyAuthority(Authority.USER.name())
-             //   . requestMatchers(HttpMethod.GET,   "swagger-ui/index.html/").hasAnyAuthority(Authority.USER.name()))
-
-//                .requestMatchers("/v2/api-docs",
-//                        "/api-docs",
-//                        "/configuration/ui",
-//                        "/swagger-resources/**",
-//                        "/configuration/security",
-//                        "/swagger-ui/**",
-//                        "/webjars/**",
-//                        "/actuator/**",
-//                        "/v1/verifyEmailId/**",
-//                        "/v1/login",
-//                        "/v1/register").permitAll()
-//                .anyRequest().authenticated())
-                )
+                        .requestMatchers(HttpMethod.GET, "/api/v1/user", "/api/v1/user/**").hasAnyAuthority(Authority.USER.name())
+                        . requestMatchers(HttpMethod.POST,   "/api/v1/post/create").hasAnyAuthority(Authority.USER.name()))
                 .build();
     }
     /**

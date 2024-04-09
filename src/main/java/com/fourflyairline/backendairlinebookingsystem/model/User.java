@@ -36,7 +36,7 @@ public class User {
     private String lastName;
     private String phoneNumber;
     private String gender;
-    private LocalDateTime dob;
+    private String dob;
     private String NIC;
 
 

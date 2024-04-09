@@ -1,13 +1,10 @@
 package com.fourflyairline.backendairlinebookingsystem.controllers;
 
+import com.fourflyairline.backendairlinebookingsystem.exceptions.AirlineBookingSystemException;
 import com.fourflyairline.backendairlinebookingsystem.services.FlightService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +14,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FlightController {
     private final FlightService flightService;
+
+
+    @GetMapping("{id}")
+    public ResponseEntity<?> getFlight(@PathVariable Long id)  {
+        try {
+            return ResponseEntity.ok(flightService.getFlightBy(id));
+        }catch (AirlineBookingSystemException exception){
+            return ResponseEntity.badRequest().body(exception);
+        }
+    }
 
     @GetMapping
     public ResponseEntity<?> getFlights(@RequestParam int page, @RequestParam int size){
@@ -37,5 +44,6 @@ public class FlightController {
                                                   @RequestParam LocalDateTime arrivalTime){
         return ResponseEntity.ok(flightService.getFlightsByTwoDatesBetween(routeId, departureTime, arrivalTime));
     }
+
 
 }

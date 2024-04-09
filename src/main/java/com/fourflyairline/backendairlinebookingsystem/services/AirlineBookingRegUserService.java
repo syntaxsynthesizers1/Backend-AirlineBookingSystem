@@ -4,7 +4,7 @@ package com.fourflyairline.backendairlinebookingsystem.services;
 import com.fourflyairline.backendairlinebookingsystem.dto.request.ChangePasswordRequest;
 import com.fourflyairline.backendairlinebookingsystem.dto.request.CreateUserRequest;
 import com.fourflyairline.backendairlinebookingsystem.dto.response.UserResponse;
-import com.fourflyairline.backendairlinebookingsystem.exceptions.CollegeCourseRegistrationException;
+import com.fourflyairline.backendairlinebookingsystem.exceptions.AirlineBookingSystemException;
 import com.fourflyairline.backendairlinebookingsystem.globalDTO.Response;
 import com.fourflyairline.backendairlinebookingsystem.model.User;
 import com.fourflyairline.backendairlinebookingsystem.model.VerificationToken;
@@ -40,10 +40,10 @@ public class AirlineBookingRegUserService implements UserService {
 
 
     @Override
-    public User createUser(CreateUserRequest createUserRequest) throws CollegeCourseRegistrationException {
+    public User createUser(CreateUserRequest createUserRequest) throws AirlineBookingSystemException {
         // Check if the user already exists
         if (userRepository.findByEmail(createUserRequest.getEmail()).isPresent()) {
-            throw new CollegeCourseRegistrationException("User with this email already exists");
+            throw new AirlineBookingSystemException("User with this email already exists");
         }
 
         // Encode the password before saving
@@ -55,23 +55,28 @@ public class AirlineBookingRegUserService implements UserService {
         newUser.setPassword(encodedPassword);
         newUser.setFirstName(createUserRequest.getFirstName());
         newUser.setLastName(createUserRequest.getLastName());
+        newUser.setGender(createUserRequest.getGender());
+        newUser.setDob(createUserRequest.getDob());
+        newUser.setNIC(createUserRequest.getNic());
+        newUser.setPhoneNumber(createUserRequest.getPhoneNumber());
         String token =  UUID.randomUUID().toString();
         VerificationToken verificationToken = new VerificationToken(token, newUser);
         tokenRepository.save(verificationToken);
        newUser.setToken(verificationToken);
         newUser.setAuthorities(List.of(USER));
 
+
         return userRepository.save(newUser);
     }
 
     @Override
-    public Response changePassword(ChangePasswordRequest changePasswordRequest) throws CollegeCourseRegistrationException {
+    public Response changePassword(ChangePasswordRequest changePasswordRequest) throws AirlineBookingSystemException {
         Optional<User> user = getUserBy(changePasswordRequest.getEmail());
         if (user.isEmpty()) {
-            throw new CollegeCourseRegistrationException("User not found");
+            throw new AirlineBookingSystemException("User not found");
         }
         if (!user.get().getPassword().equals(changePasswordRequest.getOldPassword()) ) {
-            throw new CollegeCourseRegistrationException("Invalid Password");
+            throw new AirlineBookingSystemException("Invalid Password");
         }
         user.get().setPassword(changePasswordRequest.getNewPassword());
 
@@ -86,14 +91,21 @@ public class AirlineBookingRegUserService implements UserService {
 
 
     @Override
-    public User getUserById(Long id) throws CollegeCourseRegistrationException {
+    public User getUserById(Long id) throws AirlineBookingSystemException {
         return userRepository.findById(id).orElseThrow(
-                ()-> new CollegeCourseRegistrationException(String.format("user with id %d not found", id))
+                ()-> new AirlineBookingSystemException(String.format("user with id %d not found", id))
         );
     }
     @Override
-    public UserResponse getUserBy(Long id) throws CollegeCourseRegistrationException {
+    public UserResponse getUserBy(Long id) throws AirlineBookingSystemException {
         User user = getUserById(id);
+        return modelMapper.map(user, UserResponse.class);
+    }
+    @Override
+    public UserResponse getUserByEmail(String email) throws AirlineBookingSystemException {
+        User user =  userRepository.findByEmail(email).orElseThrow(
+                ()-> new AirlineBookingSystemException(String.format("user with id %d not found", email))
+        );
         return modelMapper.map(user, UserResponse.class);
     }
 
@@ -111,12 +123,13 @@ public class AirlineBookingRegUserService implements UserService {
 
     @Override
     public Optional<User> getUserBy(String email) {
+
         return userRepository.findByEmail(email);
     }
 
-    private void updatePassword(String email, String newPassword) throws CollegeCourseRegistrationException {
+    private void updatePassword(String email, String newPassword) throws AirlineBookingSystemException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CollegeCourseRegistrationException("User not found with email: " + email));
+                .orElseThrow(() -> new AirlineBookingSystemException("User not found with email: " + email));
 
 
         user.setPassword(passwordEncoder.encode(newPassword));

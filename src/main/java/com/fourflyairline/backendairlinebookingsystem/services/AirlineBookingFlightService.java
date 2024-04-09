@@ -2,7 +2,10 @@ package com.fourflyairline.backendairlinebookingsystem.services;
 
 
 import com.fourflyairline.backendairlinebookingsystem.dto.response.FlightResponse;
+import com.fourflyairline.backendairlinebookingsystem.dto.response.UserResponse;
+import com.fourflyairline.backendairlinebookingsystem.exceptions.AirlineBookingSystemException;
 import com.fourflyairline.backendairlinebookingsystem.model.Flights;
+import com.fourflyairline.backendairlinebookingsystem.model.User;
 import com.fourflyairline.backendairlinebookingsystem.repositories.FlightsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +46,18 @@ public class AirlineBookingFlightService implements FlightService{
                     .toList();
 
         }
+
+    @Override
+    public Flights getFlightById(Long id) throws AirlineBookingSystemException {
+        return flightsRepository.findById(id).orElseThrow(
+                ()-> new AirlineBookingSystemException(String.format("flight with id %d not found", id))
+        );
+    }
+    @Override
+    public FlightResponse getFlightBy(Long id) throws AirlineBookingSystemException {
+        Flights flights = getFlightById(id);
+        return modelMapper.map(flights, FlightResponse.class);
+    }
 
 
 

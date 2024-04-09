@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -15,4 +17,8 @@ public class AuthRequest {
     private String password;
     private String firstName;
     private String lastName;
+   private String gender;
+    private String phoneNumber;
+   private String dob;
+   private String nic;
 }

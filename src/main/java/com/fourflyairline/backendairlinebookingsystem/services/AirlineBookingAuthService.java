@@ -6,7 +6,7 @@ import com.fourflyairline.backendairlinebookingsystem.dto.request.CreateUserRequ
 import com.fourflyairline.backendairlinebookingsystem.dto.request.ForgotPasswordRequest;
 import com.fourflyairline.backendairlinebookingsystem.dto.response.AuthResponse;
 import com.fourflyairline.backendairlinebookingsystem.dto.response.ValidateResponse;
-import com.fourflyairline.backendairlinebookingsystem.exceptions.CollegeCourseRegistrationException;
+import com.fourflyairline.backendairlinebookingsystem.exceptions.AirlineBookingSystemException;
 import com.fourflyairline.backendairlinebookingsystem.globalDTO.Response;
 import com.fourflyairline.backendairlinebookingsystem.mail.CollegeCourseEmailService;
 import com.fourflyairline.backendairlinebookingsystem.mail.EmailRequest;
@@ -37,7 +37,7 @@ public class AirlineBookingAuthService implements AuthService {
 
 
     @Override
-    public AuthResponse register(AuthRequest registerRequest) throws CollegeCourseRegistrationException {
+    public AuthResponse register(AuthRequest registerRequest) throws AirlineBookingSystemException {
 
         CreateUserRequest createUserRequest = modelMapper.map(registerRequest, CreateUserRequest.class);
         User user = userService.createUser(createUserRequest);
@@ -49,10 +49,10 @@ public class AirlineBookingAuthService implements AuthService {
 
 
 
-    public void initiateUserVerificationEmail(String email) throws CollegeCourseRegistrationException {
+    public void initiateUserVerificationEmail(String email) throws AirlineBookingSystemException {
         Optional<User> user = userService.getUserBy(email);
         if (user.isEmpty()) {
-            throw new CollegeCourseRegistrationException("User not found");
+            throw new AirlineBookingSystemException("User not found");
         }
         EmailRequest emailRequest = new EmailRequest();
         emailRequest.setTo(user.get().getEmail());
@@ -69,23 +69,23 @@ public class AirlineBookingAuthService implements AuthService {
     }
 
 
-    public ValidateResponse verify(String token) throws CollegeCourseRegistrationException {
+    public ValidateResponse verify(String token) throws AirlineBookingSystemException {
         Optional<VerificationToken> theToken = tokenRepository.findVerificationTokensByToken(token);
         if (theToken.isPresent() && theToken.get().getUser().isEnabled()){
-            throw  new CollegeCourseRegistrationException("This account has already been verified, please, login");
+            throw  new AirlineBookingSystemException("This account has already been verified, please, login");
         }
         String verificationResult = validateToken(token);
         if (verificationResult.equalsIgnoreCase("valid")){
             return new ValidateResponse("Email verified successfully. Now you can login to your account");
         } else {
-       throw new CollegeCourseRegistrationException("Invalid verification token");}
+       throw new AirlineBookingSystemException("Invalid verification token");}
     }
 
     @Override
-    public Response forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws CollegeCourseRegistrationException {
+    public Response forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws AirlineBookingSystemException {
         Optional<User> user = userService.getUserBy(forgotPasswordRequest.getEmail());
         if (user.isEmpty()) {
-            throw new CollegeCourseRegistrationException("User not found");
+            throw new AirlineBookingSystemException("User not found");
         }
         user.get().setPassword(forgotPasswordRequest.getNewPassword());
         return new Response("Password changed successfully");
